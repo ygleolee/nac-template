@@ -1,6 +1,6 @@
 ## things to add
 - array segtree implementation
-- system of crt (?)
+- system of crt (?), Lucas's Theorem (?)
 - mobius
 - cartesian tree
 - some game theory
