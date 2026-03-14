@@ -2,24 +2,32 @@
 
 \section{Modular arithmetic}
 	\kactlimport{ModularArithmetic.h}
-	% \kactlimport{ModInverse.h}
-	% \kactlimport{ModPow.h}
+	\kactlimport{ModInverse.h}
+	\kactlimport{ModPow.h}
 	\kactlimport{ModLog.h}
-	% \kactlimport{ModSum.h}
+	\kactlimport{ModSum.h}
 	\kactlimport{ModSqrt.h}
 
 \section{Primality}
 	% \kactlimport{FastEratosthenes.h}
-% TODO: add linear sieve, mobius, multiplicative functions in general
-% TODO: add mobius code & descriptions
 	\kactlimport{MillerRabin.h}
 	\kactlimport{ModMulLL.h}
 	\kactlimport{Factor.h}
+  \kactlimport{LinearSieve.h}
+  Mobius identity: $\sum_{d|n} \mu(d) = I[n = 1]$. Example usage:
+  \(
+  \sum_{i=1}^{n} \sum_{j=1}^{n} I[\text{gcd}(i, j) = 1]
+  = \sum_{i=1}^{n} \sum_{j=1}^{n} \sum_{d|gcd(i, j)} \mu(d)
+  = \sum_{d=1}^{n} \sum_{i=1}^{n} I[d | i] \sum_{j=1}^{n} I[d | j] \mu(d)
+  = \sum_{d=1}^{n} \lfloor i/d \rfloor \lfloor j/d \rfloor \mu(d)
+  \)
+  Multiplicative functions: $f(pq) = f(p)f(q)$ if $\text{gcd}(p, q) = 1$, can calculate using linear sieve. When we don't know the closed form for $p | q$, let $\text{cnt}(q)$ denote the power of the smallest prime (in this case $p$ by the linear sieve) that divides $q$, we have
+  $f(p \cdot q) = f \left( p^{\text{cnt}(q) + 1} \right) \cdot f(q) \cdot f \left( p^{\text{cnt}(q)} \right)^{-1}$. $\text{cnt}$ can be calculated along with the linear sieve (see example).
 
 \section{Divisibility}
 	\kactlimport{euclid.h}
 	\kactlimport{CRT.h}
-% TODO: add system of CRT
+	\kactlimport{CRTSystem.h}
 
 	\subsection{Bézout's identity}
 	For $a \neq $, $b \neq 0$, then $d=gcd(a,b)$ is the smallest positive integer for which there are integer solutions to
@@ -30,7 +38,7 @@
 	\kactlimport{phiFunction.h}
 
 \section{Fractions}
-% TODO: add fractions class
+  \kactlimport{Rational.h}
 	\kactlimport{ContinuedFractions.h}
 	\kactlimport{FracBinarySearch.h}
 

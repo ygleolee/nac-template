@@ -14,11 +14,13 @@ def escape(input):
     input = input.replace('>', r'\ensuremath{>}')
     return input
 
+
 def pathescape(input):
     input = input.replace('\\', r'\\')
     input = input.replace('_', r'\_')
     input = escape(input)
     return input
+
 
 def codeescape(input):
     input = input.replace('_', r'\_')
@@ -29,6 +31,7 @@ def codeescape(input):
     input = escape(input)
     return input
 
+
 def ordoescape(input, esc=True):
     if esc:
         input = escape(input)
@@ -36,7 +39,7 @@ def ordoescape(input, esc=True):
     if start >= 0:
         bracketcount = 1
         end = start+1
-        while end+1<len(input) and bracketcount>0:
+        while end+1 < len(input) and bracketcount > 0:
             end = end + 1
             if input[end] == '(':
                 bracketcount = bracketcount + 1
@@ -46,17 +49,20 @@ def ordoescape(input, esc=True):
             return r"%s\bigo{%s}%s" % (input[:start], input[start+2:end], ordoescape(input[end+1:], False))
     return input
 
+
 def addref(caption, outstream):
     caption = pathescape(caption).strip()
     print(r"\kactlref{%s}" % caption, file=outstream)
     with open('header.tmp', 'a') as f:
         f.write(caption + "\n")
 
+
 COMMENT_TYPES = [
     ('/**', '*/'),
     ("'''", "'''"),
     ('"""', '"""'),
 ]
+
 
 def find_start_comment(source, start=None):
     first = (-1, -1, None)
@@ -67,8 +73,10 @@ def find_start_comment(source, start=None):
 
     return first
 
+
 def processwithcomments(caption, instream, outstream, listingslang):
-    knowncommands = ['Author', 'Date', 'Description', 'Source', 'Time', 'Memory', 'License', 'Status', 'Usage', 'Details']
+    knowncommands = ['Author', 'Date', 'Description', 'Source',
+                     'Time', 'Memory', 'License', 'Status', 'Usage', 'Details']
     requiredcommands = ['Author', 'Description']
     includelist = []
     error = ""
@@ -109,7 +117,7 @@ def processwithcomments(caption, instream, outstream, listingslang):
     while start >= 0 and not error:
         nsource = nsource.rstrip() + source[end:start]
         end = source.find(end_str, start2)
-        if end<start:
+        if end < start:
             error = "Invalid %s %s comments." % (source[start:start2], end_str)
             break
         comment = source[start2:end].strip()
@@ -141,18 +149,23 @@ def processwithcomments(caption, instream, outstream, listingslang):
             commands[command] = value.lstrip()
     for rcommand in sorted(set(requiredcommands) - set(commands)):
         error = error + "Missing command: " + rcommand + ". "
-    if end>=0:
+    if end >= 0:
         nsource = nsource.rstrip() + source[end:]
     nsource = nsource.strip()
 
-    if listingslang in ['C++', 'Java']:
-        hash_script = 'hash'
-        p = subprocess.Popen(['sh', 'content/contest/%s.sh' % hash_script], stdin=subprocess.PIPE, stdout=subprocess.PIPE, encoding="utf-8")
-        hsh, _ = p.communicate(nsource)
-        hsh = hsh.split(None, 1)[0]
-        hsh = hsh + ', '
-    else:
-        hsh = ''
+    # Change Start: Removed Hashing Functionality
+    # if listingslang in ['C++', 'Java']:
+    #     hash_script = 'hash'
+    #     p = subprocess.Popen(['sh', 'content/contest/%s.sh' % hash_script],
+    #                          stdin=subprocess.PIPE, stdout=subprocess.PIPE, encoding="utf-8")
+    #     hsh, _ = p.communicate(nsource)
+    #     hsh = hsh.split(None, 1)[0]
+    #     hsh = hsh + ', '
+    # else:
+    #     hsh = ''
+    hsh = ''
+    # Change End
+
     # Produce output
     out = []
     if warning:
@@ -162,7 +175,8 @@ def processwithcomments(caption, instream, outstream, listingslang):
     else:
         addref(caption, outstream)
         if commands.get("Description"):
-            out.append(r"\defdescription{%s}" % escape(commands["Description"]))
+            out.append(r"\defdescription{%s}" %
+                       escape(commands["Description"]))
         if commands.get("Usage"):
             out.append(r"\defusage{%s}" % codeescape(commands["Usage"]))
         if commands.get("Time"):
@@ -170,27 +184,34 @@ def processwithcomments(caption, instream, outstream, listingslang):
         if commands.get("Memory"):
             out.append(r"\defmemory{%s}" % ordoescape(commands["Memory"]))
         if includelist:
-            out.append(r"\leftcaption{%s}" % pathescape(", ".join(includelist)))
+            out.append(r"\leftcaption{%s}" %
+                       pathescape(", ".join(includelist)))
         if nsource:
-            out.append(r"\rightcaption{%s%d lines}" % (hsh, len(nsource.split("\n"))))
+            out.append(r"\rightcaption{%s%d lines}" %
+                       (hsh, len(nsource.split("\n"))))
         langstr = ", language="+listingslang
-        out.append(r"\begin{lstlisting}[caption={%s}%s]" % (pathescape(caption), langstr))
+        out.append(r"\begin{lstlisting}[caption={%s}%s]" % (
+            pathescape(caption), langstr))
         out.append(nsource)
         out.append(r"\end{lstlisting}")
 
     for line in out:
         print(line, file=outstream)
 
-def processraw(caption, instream, outstream, listingslang = 'raw'):
+
+def processraw(caption, instream, outstream, listingslang='raw'):
     try:
         source = instream.read().strip()
         addref(caption, outstream)
-        print(r"\rightcaption{%d lines}" % len(source.split("\n")), file=outstream)
-        print(r"\begin{lstlisting}[language=%s,caption={%s}]" % (listingslang, pathescape(caption)), file=outstream)
+        print(r"\rightcaption{%d lines}" %
+              len(source.split("\n")), file=outstream)
+        print(r"\begin{lstlisting}[language=%s,caption={%s}]" % (
+            listingslang, pathescape(caption)), file=outstream)
         print(source, file=outstream)
         print(r"\end{lstlisting}", file=outstream)
     except:
         print(r"\kactlerror{Could not read source.}", file=outstream)
+
 
 def parse_include(line):
     line = line.strip()
@@ -198,11 +219,14 @@ def parse_include(line):
         return line[8:].strip()
     return None
 
+
 def getlang(input):
-    return input.rsplit('.',1)[-1]
+    return input.rsplit('.', 1)[-1]
+
 
 def getfilename(input):
-    return input.rsplit('/',1)[-1]
+    return input.rsplit('/', 1)[-1]
+
 
 def print_header(data, outstream):
     parts = data.split('|')
@@ -218,6 +242,7 @@ def print_header(data, outstream):
 
     ind = lines.index(until) + 1
     header_length = len("".join(lines[:ind]))
+
     def adjust(name):
         return name if name.startswith('.') else name.split('.')[0]
     output = r"\enspace{}".join(map(adjust, lines[:ind]))
@@ -231,6 +256,7 @@ def print_header(data, outstream):
         for line in lines[ind:]:
             f.write(line + "\n")
 
+
 def main():
     language = None
     caption = None
@@ -238,7 +264,8 @@ def main():
     outstream = sys.stdout
     print_header_value = None
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "ho:i:l:c:", ["help", "output=", "input=", "language=", "caption=", "print-header="])
+        opts, args = getopt.getopt(sys.argv[1:], "ho:i:l:c:", [
+                                   "help", "output=", "input=", "language=", "caption=", "print-header="])
         for option, value in opts:
             if option in ("-h", "--help"):
                 print("This is the help section for this program")
@@ -273,7 +300,8 @@ def main():
         elif language in ["java", "kt"]:
             processwithcomments(caption, instream, outstream, 'Java')
         elif language == "ps":
-            processraw(caption, instream, outstream) # PostScript was added in listings v1.4
+            # PostScript was added in listings v1.4
+            processraw(caption, instream, outstream)
         elif language == "raw":
             processraw(caption, instream, outstream)
         elif language == "rawcpp":
@@ -290,6 +318,7 @@ def main():
         print(str(err), file=sys.stderr)
         print("\t for help use --help", file=sys.stderr)
         return 2
+
 
 if __name__ == "__main__":
     exit(main())

@@ -16,11 +16,10 @@
 
 \section{Matching}
 	\kactlimport{HopcroftKarp.h}
-	% \kactlimport{DFSMatching.h}
+	\kactlimport{DFSMatching.h}
 	\kactlimport{MinimumVertexCover.h}
-  % TODO: change dfsmatching call to hk
 	\kactlimport{WeightedMatching.h}
-	% \kactlimport{GeneralMatching.h}
+	\kactlimport{GeneralMatching.h}
 
 \section{DFS algorithms}
 	\kactlimport{SCC.h}
@@ -41,7 +40,7 @@
 	\kactlimport{LCA.h}
 	\kactlimport{CompressTree.h}
 	\kactlimport{HLD.h}
-  % TODO: add segtree on top (?
+  % TODO: Jimmy might want to change this
 	\kactlimport{LinkCutTree.h}
 	\kactlimport{DirectedMST.h}
 
@@ -54,7 +53,6 @@
 		\texttt{mat[a][b]--, mat[b][b]++} (and \texttt{mat[b][a]--, mat[a][a]++} if $G$ is undirected).
 		Remove the $i$th row and column and take the determinant; this yields the number of directed spanning trees rooted at $i$
 		(if $G$ is undirected, remove any row/column).
-
 	\subsection{Erdős–Gallai theorem}
 		% Source: https://en.wikipedia.org/wiki/Erd%C5%91s%E2%80%93Gallai_theorem
 		% Test: stress-tests/graph/erdos-gallai.cpp
